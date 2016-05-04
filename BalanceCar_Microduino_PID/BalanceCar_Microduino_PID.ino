@@ -4,6 +4,7 @@
 #include "RollPitch.h"
 #include "Protocol.h"       //通讯协议库
 
+MPU6050 imu;
 Stepper stepperL(PIN_DIRB, PIN_STEPB);              //左电机，使用stepper底板A接口
 Stepper stepperR(PIN_DIRA, PIN_STEPA);              //右电机，使用stepper底板D接口
 PID speedPID((double)KP_SPD, (double)KI_SPD, (double)KD_SPD, DIRECT);     //速度环控制器
@@ -47,7 +48,7 @@ void setup() {
 
 void loop() {
   if (protocolRead(channalData, mode)) { //判断是否接收到遥控信号
-    throttle = map(channalData[CHANNEL_THROTTLE], 1000, 2000, -MAX_THROTTLE, MAX_THROTTLE);
+    throttle = map(channalData[CHANNEL_THROTTLE], 1000, 2000, MAX_THROTTLE, -MAX_THROTTLE);
     steering = map(channalData[CHANNEL_STEERING], 1000, 2000, -MAX_STEERING, MAX_STEERING);
     safe_ms = millis();
   }
@@ -67,7 +68,7 @@ void loop() {
   float robotSpeed = (stepperL.getSpeed() - stepperR.getSpeed()) / 2.0;   //计算小车速度
 
   float angleVelocity = (robotAngle - robotAngleCache) * 90.0;
-  robotSpeedFilter = robotSpeedFilter * 0.85 + (robotSpeed + angleVelocity) * 0.15;       //小车速度滤波
+  robotSpeedFilter = robotSpeedFilter * 0.95 + (robotSpeed + angleVelocity) * 0.05;       //小车速度滤波
   float targetAngle = speedPID.Compute(robotSpeedFilter, throttle);       //速度环计算目标角度
   targetSpeed += anglePID.Compute(robotAngle, targetAngle);         //角度环计算电机转速
   targetSpeed = constrain(targetSpeed, -MAX_SPEED, MAX_SPEED);
