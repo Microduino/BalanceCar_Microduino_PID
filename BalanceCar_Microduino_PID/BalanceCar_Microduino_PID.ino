@@ -5,8 +5,8 @@
 #include "Protocol.h"       //通讯协议库
 
 MPU6050 imu;
-Stepper stepperL(PIN_DIRB, PIN_STEPB);              //左电机，使用stepper底板A接口
-Stepper stepperR(PIN_DIRA, PIN_STEPA);              //右电机，使用stepper底板D接口
+StepMotor stepperL(PIN_DIRB, PIN_STEPB);              //左电机，使用stepper底板A接口
+StepMotor stepperR(PIN_DIRA, PIN_STEPA);              //右电机，使用stepper底板D接口
 PID speedPID((double)KP_SPD, (double)KI_SPD, (double)KD_SPD, DIRECT);     //速度环控制器
 PID anglePID((double)KP_ANG, (double)KI_ANG, (double)KD_ANG, DIRECT);     //角度环控制器
 
